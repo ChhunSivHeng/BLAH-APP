@@ -47,4 +47,4 @@ flutter:
         - asset: assets/fonts/GT-Eesti-Thin.otf
  
   assets:
-    - assets/images
+    - assets/images/
