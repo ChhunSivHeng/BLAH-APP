@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../dummy_data/dummy_data.dart';
 import '../model/ride/locations.dart';
 import '../model/ride/ride.dart';
@@ -9,9 +11,7 @@ class RidesService {
   //  filter the rides starting from given departure location
   //
   static List<Ride> _filterByDeparture(List<Ride> rides, Location departure) {
-    availableRides.where((rides) 
-    => rides.departureLocation == departure).toList();
-
+    return rides.where((ride) => ride.departureLocation == departure).toList();
   }
 
   //
@@ -21,20 +21,22 @@ class RidesService {
     List<Ride> rides,
     int requestedSeat,
   ) {
-    availableRides.where((rides) 
-    => rides.availableSeats == requestedSeat).toList();
+    return rides.where((ride) => ride.availableSeats >= requestedSeat).toList();
   }
 
   //
   //  filter the rides   with several optional criteria (flexible filter options)
   //
   static List<Ride> filterBy({Location? departure, int? seatRequested}) {
-    availableRides.where(
-      (Ride) => (departure == null || Ride.departureLocation == departure) && //not yet done taecher
+    return availableRides.where((ride) {
+      if (departure != null && departure != ride.departureLocation) {
+        return false;
+      }
 
-
-
-
-    )
+      if (seatRequested != null && seatRequested > ride.availableSeats) {
+        return false; // i wil not keep this ride since it has less seats than requested
+      }
+      return true;
+    }).toList();
   }
 }
