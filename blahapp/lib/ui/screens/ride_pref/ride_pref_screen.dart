@@ -45,6 +45,7 @@ class _RidePrefScreenState extends State<RidePrefScreen> {
   Widget _buildForeground() {
     return Column(
       children: [
+
         SizedBox(height: 16),
         Text(
           "Your pick of rides at low price",

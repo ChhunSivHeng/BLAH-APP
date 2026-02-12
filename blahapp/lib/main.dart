@@ -1,3 +1,4 @@
+import 'package:blabla/ui/screens/ride_pref/widgets/ride_pref_form.dart';
 import 'package:flutter/material.dart';
 import 'ui/screens/ride_pref/ride_pref_screen.dart';
 import 'ui/theme/theme.dart';
@@ -15,6 +16,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: appTheme,
       home: Scaffold(body: RidePrefScreen()),
+      // home: Scaffold(body: RidePrefForm()),
     );
   }
 }
