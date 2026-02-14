@@ -15,8 +15,6 @@ class BlaBottom extends StatelessWidget {
   final VoidCallback? onPressed;        // onPressed nullable, use null when enable is false or disable botton
   final bool isPrimary;                 // handle the validation of primary and secondary botton
 
-
-  
   @override
   Widget build(BuildContext context) {
     //TODO build the botton 

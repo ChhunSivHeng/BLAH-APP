@@ -1,8 +1,13 @@
-import 'package:blabla/ui/screens/ride_pref/widgets/bla_bottom.dart';
+import 'package:blabla/dummy_data/dummy_data.dart';
+import 'package:blabla/ui/widgets/actions/bla_bottom.dart';
 import 'package:blabla/ui/theme/theme.dart';
 import 'package:flutter/material.dart';
+import '../../../../utils/date_time_util.dart';
+import '../../../../utils/animations_util.dart';
+import '../../../../ui/widgets/inputs/bla_location_picker.dart';
 import '../../../../model/ride/locations.dart';
 import '../../../../model/ride_pref/ride_pref.dart';
+import 'ride_prefs_input.dart'; // added import
 
 ///
 /// A Ride Preference From is a view to select:
@@ -28,6 +33,7 @@ class _RidePrefFormState extends State<RidePrefForm> {
   late DateTime departureDate;
   Location? arrival;
   late int requestedSeats;
+  // Based on Teacher Code
 
   // ----------------------------------
   // Initialize the Form attributes
@@ -37,15 +43,59 @@ class _RidePrefFormState extends State<RidePrefForm> {
   void initState() {
     super.initState();
     // TODO
+    departure = widget.initRidePref?.departure ?? fakeLocations[0];
+    departureDate = widget.initRidePref?.departureDate ?? DateTime.now();
+    arrival = widget.initRidePref?.arrival ?? fakeLocations[1];
+    requestedSeats = widget.initRidePref?.requestedSeats ?? 1;
   }
 
   // ----------------------------------
   // Handle events
   // ----------------------------------
 
+  void onDeparturePressed() async {
+    Location? selectedLocation = await Navigator.of(context).push<Location>(
+      AnimationUtils.createBottomToTopRoute(
+        BlaLocationPicker(initLocation: departure),
+      ),
+    );
+    if (selectedLocation != null) {
+      // Update the deparure if not null
+      setState(() {
+        departure = selectedLocation;
+      });
+    }
+  }
+
+  void onArrivalPressed() async {
+    Location? selectedLocation = await Navigator.of(context).push<Location>(
+      AnimationUtils.createBottomToTopRoute(
+        BlaLocationPicker(initLocation: arrival),
+      ),
+    );
+    if (selectedLocation != null) {              // Update the arrival if not null
+      setState(() {
+        arrival = selectedLocation;
+      });
+    }
+  }
+
   // ----------------------------------
   // Compute the widgets rendering
   // ----------------------------------
+
+  String get departureLabel =>
+      departure != null ? departure!.name : "Leaving from";
+  String get arrivalLabel => arrival != null ? arrival!.name : "Going to";
+
+  bool get showDeparturePLaceHolder => departure == null;
+  bool get showArrivalPLaceHolder => arrival == null;
+
+  String get dateLabel => DateTimeUtils.formatDateTime(departureDate);
+  String get numberLabel => requestedSeats.toString();
+
+  bool get switchVisible => arrival != null && departure != null;
+
 
   void _swaping() {
     // for swap the location
@@ -59,34 +109,6 @@ class _RidePrefFormState extends State<RidePrefForm> {
   // ----------------------------------
   // Build the widgets
   // ----------------------------------
-
-  //build the Screen Widget
-
-  Widget _buildForm({
-    required IconData icon,
-    required String txt,
-    VoidCallback? onTab,
-  }) {
-    return InkWell(// to detect user pressing, execute the print and show it in termial, Also Inkwell show the Point cursor, gestdetector show nothing
-      onTap: onTab,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        child: Row(
-          children: [
-            Icon(icon, color: BlaColors.iconLight),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                txt,
-                style: TextStyle(fontSize: 16, color: BlaColors.textLight),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -106,50 +128,46 @@ class _RidePrefFormState extends State<RidePrefForm> {
                   Expanded(
                     // to expended between IconBotton (Swaping) and Departure (take most part)
                     // departure form
-                    child: _buildForm(
-                      icon: Icons.radio_button_unchecked,
-                      txt:
-                          departure?.name ??
-                          "Departure", // beware of app crushing, if departure is null, it return Departure, if not null it get the name
-                      onTab: () {
-                        print(
-                          'Departure works',
-                        ); // TO make sure the Tab is worked
-                      },
+                    child: RidePrefsInput(
+                      icon: Icons.location_on,
+                      txt: departureLabel,
+                      isPlaceholder: showDeparturePLaceHolder,
+                      onTap: onDeparturePressed,
                     ),
                   ),
                   // swaping between
-                  IconButton(
-                    onPressed: _swaping,
-                    icon: const Icon(Icons.swap_vert),
-                    color: BlaColors.primary,
-                  ),
+                  switchVisible
+                      ? IconButton(
+                          onPressed: _swaping,
+                          icon: const Icon(Icons.swap_vert),
+                          color: BlaColors.primary,
+                        )
+                      : const SizedBox(width: 48),
                 ],
               ),
               const Divider(height: 1), //devid line ____
               // Arrival
-              _buildForm(
-                icon: Icons.radio_button_unchecked,
-                txt: arrival?.name ?? "Arrival",
-                onTab: () {
-                  print(' The Best :p ');
-                },
+              RidePrefsInput(
+                icon: Icons.location_on,
+                txt: arrivalLabel,
+                isPlaceholder: showArrivalPLaceHolder,
+                onTap: onArrivalPressed,
               ),
               const Divider(height: 1),
               // Date Picker
-              _buildForm(
+              RidePrefsInput(
                 icon: Icons.calendar_month_outlined,
-                txt: "Date",
-                onTab: () {
+                txt: dateLabel,
+                onTap: () {
                   print(' Not yet implement date ');
                 },
               ),
-              const Divider(height: 1),
+              const Divider(height: 1,),
               // Seat
-              _buildForm(
+              RidePrefsInput(
                 icon: Icons.person,
-                txt: '1' ,
-                onTab: () {
+                txt: numberLabel,
+                onTap: () {
                   print(' Not yet implement Seat ');
                 },
               ),
